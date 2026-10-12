@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ur Capsule Memory | Let time reveal it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span>⏳</span>
+                <span>Ur Memory Capsule</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-target="view-home">⌂ Home</a></li>
+                <li><a href="#" class="nav-link" data-target="view-dashboard">🗂 My Capsules</a></li>
+                <li><a href="#" class="nav-link" data-target="view-archive">🏛 Archive</a></li>
+                <li><a href="#" class="nav-link" data-target="view-timeline">⏱ Timeline</a></li>
+                <li><a href="#" class="nav-link" data-target="view-settings">⚙ Settings</a></li>
+            </ul>
+            <div class="profile-widget">
+                <p id="nav-greeting" class="text-muted">Welcome.</p>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- VIEW: HOME -->
+            <section id="view-home" class="view active">
+                <div class="hero">
+                    <div class="envelope-animation">✉️</div>
+                    <h1>Write something now.<br>Seal it. Let time reveal it.</h1>
+                    <p>Create a digital archive for your future self.</p>
+                    <button class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 2.5rem;" onclick="app.navigateTo('view-create')">
+                        CREATE CAPSULE
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIEW: DASHBOARD (Active Capsules) -->
+            <section id="view-dashboard" class="view">
+                <div class="header-action">
+                    <div>
+                        <h1>My Capsules</h1>
+                        <p class="text-muted" id="capsule-limit-text">Active capsules: 0/5</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.navigateTo('view-create')" id="btn-dashboard-create">
+                        + New Capsule
+                    </button>
+                </div>
+                <div class="capsule-grid" id="active-capsules-grid">
+                    <!-- Capsules injected here -->
+                </div>
+            </section>
+
+            <!-- VIEW: ARCHIVE -->
+            <section id="view-archive" class="view">
+                <div class="header-action">
+                    <div>
+                        <h1>The Archive</h1>
+                        <p class="text-muted">Opened and unsealed memories.</p>
+                    </div>
+                </div>
+                <div class="capsule-grid" id="archive-capsules-grid">
+                    <!-- Archived capsules injected here -->
+                </div>
+            </section>
+
+            <!-- VIEW: TIMELINE -->
+            <section id="view-timeline" class="view">
+                <div class="header-action">
+                    <h1>Timeline</h1>
+                </div>
+                <div class="timeline-container" id="timeline-container">
+                    <!-- Timeline injected here -->
+                </div>
+            </section>
+
+            <!-- VIEW: SETTINGS -->
+            <section id="view-settings" class="view">
+                <div class="header-action">
+                    <h1>Settings</h1>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Profile</h2>
+                    <div class="input-group">
+                        <label>Your Name</label>
+                        <input type="text" id="setting-name" placeholder="What should we call you?">
+                    </div>
+                    <button class="btn btn-primary" onclick="app.saveProfile()">Save Profile</button>
+                </div>
+
+                <div class="form-section">
+                    <h2>Appearance</h2>
+                    <div class="input-group">
+                        <label>Theme</label>
+                        <select id="setting-theme" onchange="app.changeTheme(this.value)">
+                            <option value="light">Light (Paper)</option>
+                            <option value="dark">Dark (Midnight)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section" style="border-color: var(--accent-color);">
+                    <h2>Time Simulation (Demo Mode)</h2>
+                    <p class="text-muted mb-4">Jump forward in time to demonstrate unlocking capsules without waiting.</p>
+                    <div class="input-group">
+                        <label>Simulate Date & Time</label>
+                        <input type="datetime-local" id="setting-demo-time">
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="app.enableDemoMode()">Start Simulation</button>
+                        <button class="btn btn-outline" onclick="app.disableDemoMode()">Reset to Real Time</button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Data Management</h2>
+                    <p class="text-muted mb-4">Export your capsules to a JSON file to back them up, or import an existing backup.</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-outline" onclick="app.exportData()">📥 Export Backup</button>
+                        <button class="btn btn-outline" onclick="document.getElementById('import-file').click()">📤 Import Backup</button>
+                        <input type="file" id="import-file" accept=".json" style="display:none" onchange="app.importData(event)">
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: CREATE CAPSULE -->
+            <section id="view-create" class="view">
+                <div class="header-action">
+                    <h1>Create a Capsule</h1>
+                    <button class="btn btn-outline" onclick="app.navigateTo('view-dashboard')">Cancel</button>
+                </div>
+                
+                <form id="create-capsule-form" onsubmit="event.preventDefault(); app.initiateSeal();">
+                    
+                    <div class="form-section">
+                        <h2>1. The Basics</h2>
+                        <div class="input-group">
+                            <label>Capsule Title *</label>
+                            <input type="text" id="create-title" required placeholder="e.g., For Future Me, Before Graduation">
+                        </div>
+                        <div class="input-group">
+                            <label>Unlock Date & Time *</label>
+                            <input type="datetime-local" id="create-unlock" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Capsule Theme</label>
+                            <select id="create-theme">
+                                <option value="paper">Paper (Default)</option>
+                                <option value="midnight">Midnight</option>
+                                <option value="sunset">Sunset</option>
+                                <option value="forest">Forest</option>
+                                <option value="ocean">Ocean</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>2. The Letter</h2>
+                        <p class="text-muted mb-4">Write a message to the person you will become.</p>
+                        <div class="input-group">
+                            <textarea id="create-letter" required placeholder="Dear future me..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>3. Images (Local Storage)</h2>
+                        <p class="text-muted mb-4">Attach a few photos. (Max 500KB total to prevent storage issues).</p>
+                        <div class="file-upload-wrapper" onclick="document.getElementById('create-images').click()">
+                            Click to select images
+                        </div>
+                        <input type="file" id="create-images" accept="image/*" multiple style="display:none" onchange="app.handleImageSelect(event)">
+                        <div class="image-preview-container" id="create-image-previews"></div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>4. Top 3 Favorite Songs</h2>
+                        <p class="text-muted mb-4">What is the soundtrack of your life right now?</p>
+                        <div id="create-songs">
+                            <!-- JS injected 3 inputs -->
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>5. Goals & Predictions</h2>
+                        <div class="input-group">
+                            <label>Goals</label>
+                            <div id="create-goals-list" class="dynamic-list"></div>
+                            <button type="button" class="btn btn-outline" onclick="app.addDynamicItem('goals', 'What do you want to achieve?')">+ Add Goal</button>
+                        </div>
+                        <div class="input-group mt-4">
+                            <label>Predictions</label>
+                            <div id="create-predictions-list" class="dynamic-list"></div>
+                            <button type="button" class="btn btn-outline" onclick="app.addDynamicItem('predictions', 'What do you think will happen?')">+ Add Prediction</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>6. Custom Questions</h2>
+                        <p class="text-muted mb-4">Ask yourself questions to see how your answers change over time.</p>
+                        <div id="create-qa-list" class="dynamic-list"></div>
+                        <button type="button" class="btn btn-outline" onclick="app.addQAPair()">+ Add Q&A</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>7. Final Words</h2>
+                        <div class="input-group">
+                            <label>Short Message (Appears at the very end) *</label>
+                            <input type="text" id="create-short-message" required placeholder="e.g., Don't forget to smile.">
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="margin: 4rem 0;">
+                        <button type="submit" class="btn btn-primary" style="font-size: 1.5rem; padding: 1rem 3rem;">
+                            SEAL CAPSULE 🔒
+                        </button>
+                    </div>
+
+                </form>
+            </section>
+
+            <!-- VIEW: CAPSULE READING (Locked & Unlocked) -->
+            <section id="view-capsule" class="view">
+                <button class="btn btn-outline mb-4" onclick="app.navigateTo(app.lastListRoute)">← Back</button>
+                
+                <div id="capsule-container" class="capsule-reading-view">
+                    
+                    <!-- Locked State -->
+                    <div id="capsule-locked-content" class="locked-view-center">
+                        <div class="lock-icon">🔒</div>
+                        <h2 class="serif" id="locked-title">Title</h2>
+                        <p class="text-muted mt-4">Created: <span id="locked-created"></span></p>
+                        
+                        <div class="huge-countdown">
+                            <div class="cd-box"><span class="cd-num" id="cd-d">00</span><span class="cd-label">Days</span></div>
+                            <div class="cd-box"><span class="cd-num" id="cd-h">00</span><span class="cd-label">Hours</span></div>
+                            <div class="cd-box"><span class="cd-num" id="cd-m">00</span><span class="cd-label">Minutes</span></div>
+                            <div class="cd-box"><span class="cd-num" id="cd-s">00</span><span class="cd-label">Seconds</span></div>
+                        </div>
+
+                        <p class="text-muted">Unlocks: <span id="locked-unlocks"></span></p>
+
+                        <div style="margin-top: 4rem;">
+                            <button class="btn btn-text" onclick="app.requestBreakSeal()" style="color: var(--text-muted); font-size: 0.8rem;">
+                                Break Seal (Warning)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Unlocked State -->
+                    <div id="capsule-unlocked-content" class="hidden">
+                        
+                        <div class="reading-section">
+                            <h1 class="reading-title" id="read-title">Title</h1>
+                            <p class="reading-meta">
+                                Written on <span id="read-created"></span> • Opened on <span id="read-opened"></span>
+                            </p>
+                            <div class="letter-content" id="read-letter"></div>
+                        </div>
+
+                        <div class="reading-section" id="section-images">
+                            <h3 class="serif mb-4">Memories</h3>
+                            <div class="image-preview-container" id="read-images"></div>
+                        </div>
+
+                        <div class="reading-section" id="section-songs">
+                            <h3 class="serif mb-4">Favorite Songs</h3>
+                            <div id="read-songs"></div>
+                        </div>
+
+                        <div class="reading-section" id="section-then-now">
+                            <h3 class="serif mb-4">Then vs. Now</h3>
+                            
+                            <div id="then-now-goals"></div>
+                            <div id="then-now-predictions"></div>
+                            <div id="then-now-qa"></div>
+
+                            <div class="text-center mt-4">
+                                <button class="btn btn-primary hidden" id="btn-save-now" onclick="app.saveThenNowAnswers()">Save My Current Answers</button>
+                            </div>
+                        </div>
+
+                        <div class="final-message" id="read-short-message">
+                            <!-- Short message injected here -->
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Seal Confirmation -->
+    <div class="modal-overlay" id="modal-seal">
+        <div class="modal-content">
+            <h2 class="serif mb-4">READY TO SEAL?</h2>
+            <p>Once sealed, this capsule cannot normally be edited until its unlock date.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="app.closeModal('modal-seal')">GO BACK</button>
+                <button class="btn btn-primary" onclick="app.confirmSeal()">SEAL CAPSULE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Break Seal Warning -->
+    <div class="modal-overlay" id="modal-break">
+        <div class="modal-content" style="border-top: 4px solid #C24A3F;">
+            <h2 class="serif mb-4" style="color: #C24A3F;">BREAK THE SEAL?</h2>
+            <p>Breaking the seal means opening this capsule before its intended time. It will be permanently marked as "Seal Broken".</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="app.closeModal('modal-break')">KEEP SEALED</button>
+                <button class="btn btn-danger" onclick="app.executeBreakSeal()">BREAK THE SEAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Mode Widget -->
+    <div id="demo-widget" class="demo-widget">
+        <strong>DEMO MODE ACTIVE</strong><br>
+        <span id="demo-widget-time"></span>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="/js/script.js"></script>
+</body>
+</html>
